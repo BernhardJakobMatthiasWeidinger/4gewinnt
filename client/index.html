@@ -12,63 +12,99 @@
 
 		$(document).ready(function() {
             var socket = io();
-			var playerName = "";
-			var enemyName = "";
+			var playerColor = "";
+			var enemyColor = "";
+			var turn = false;
 			
 			$("#game").hide();
+			$("#tooManyPlayers").hide();
 			
 			for (var row=0; row < 6; row++) {
 			    $("#gameField").prepend("<tr> " + 
-				    "<td id='" + row + "1'> </td> " +
-				    "<td id='" + row + "2'> </td> " +
-				    "<td id='" + row + "3'> </td> " +
-				    "<td id='" + row + "4'> </td> " +
-				    "<td id='" + row + "5'> </td> " +
-				    "<td id='" + row + "6'> </td> " +
-				    "<td id='" + row + "7'> </td> " +
+				    "<td id='" + row + "1'></td> " +
+				    "<td id='" + row + "2'></td> " +
+				    "<td id='" + row + "3'></td> " +
+				    "<td id='" + row + "4'></td> " +
+				    "<td id='" + row + "5'></td> " +
+				    "<td id='" + row + "6'></td> " +
+				    "<td id='" + row + "7'></td> " +
 		        "</tr>");
 			}
 			
 			//Will be called on start
-			socket.on('init', function(stwing) {
+			socket.on('init', function(stwing, players) {
 			    $("#title").attr("src", 'data:image/png;base64,' + stwing);
+			    $("#start").hide(1000);
+				$("#game").show(1000);
+				
+				if (players < 3) {
+				    if (players == 1) {
+					    $("#currTurn").html("It's your turn!");
+						playerColor = "red";
+						enemyColor = "yellow";
+						turn = true;
+					} else {
+					    $("#currTurn").html("It's the others turn!");
+						playerColor = "yellow";
+						enemyColor = "red";
+					}
+				} else {
+					$("#game").hide();
+			        $("#tooManyPlayers").show(1000);
+				}
 			});
 			
-			//Click to join game
-			$(document).on('click', '#joinGame', function() {
-			    if ($("#username").val()) {
-				    username = $("#username").val();
-			        socket.emit('hello',$("#username").val());
-			        $("#start").hide();
-			        $("#game").show();
-                }
+			//Will be called when other played
+			socket.on('played', function(cell) {
+			    turn = !turn;
+				if (turn) {
+					$("#currTurn").html("It's your turn!");
+					$("#" + cell).css("background-color", enemyColor);
+					$("#" + cell).html(" ");
+				} else {
+					$("#currTurn").html("It's the others turn!");
+				}
 			});
 			
-			
+			$(document).on('click', '.btn', function() {
+			    if (turn) {
+				    var pressed = $(this).attr("id");
+				    for (var row=0; row < 6; row++) {
+					    var currBtn = row.toString() + pressed.toString();
+			            if ($("#" + currBtn).html() == "") {
+							$("#" + currBtn).css("background-color", playerColor);
+							$("#" + currBtn).html(" ");
+							socket.emit("played", currBtn);
+							break;
+						}
+					}
+				} 
+			});
 		});
         </script>
 	</head>
 	<body >
 	    <div id="start">
 		    <img id="title"/>
-			<h3> What's your username? </h3>
-			<input id="username" type="text" maxlength="15"/>
-			<br>
-			<button id="joinGame" type="button" class="btn btn-primary">Join Game</button>
 		</div>
 		
 		<div id="game">
+		    <h3 id="currTurn"> </h3>
 		    <table id="gameField" class="table table-bordered">
 				<tr id="inputField">
-				    <td> <button id="btn1" type="button" class="btn btn-primary">1</button> </td>
-				    <td> <button id="btn2" type="button" class="btn btn-primary">2</button> </td>
-				    <td> <button id="btn3" type="button" class="btn btn-primary">3</button> </td>
-				    <td> <button id="btn4" type="button" class="btn btn-primary">4</button> </td>
-				    <td> <button id="btn5" type="button" class="btn btn-primary">5</button> </td>
-				    <td> <button id="btn6" type="button" class="btn btn-primary">6</button> </td>
-				    <td> <button id="btn7" type="button" class="btn btn-primary">7</button> </td>
+				    <td> <button id="1" type="button" class="btn btn-primary">1</button> </td>
+				    <td> <button id="2" type="button" class="btn btn-primary">2</button> </td>
+				    <td> <button id="3" type="button" class="btn btn-primary">3</button> </td>
+				    <td> <button id="4" type="button" class="btn btn-primary">4</button> </td>
+				    <td> <button id="5" type="button" class="btn btn-primary">5</button> </td>
+				    <td> <button id="6" type="button" class="btn btn-primary">6</button> </td>
+				    <td> <button id="7" type="button" class="btn btn-primary">7</button> </td>
 		        </tr>
 			</table>
+		</div>
+		
+		<div id="tooManyPlayers">
+		    <h3> There are already playing 2 players! </h3>
 		</div>
 	</body>
 </html>

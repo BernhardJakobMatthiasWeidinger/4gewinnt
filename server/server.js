@@ -3,6 +3,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var fs = require('fs');
 
+var players = 0;
+
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
@@ -14,11 +16,18 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
 	console.log("user connect");
+	players++;
 	
     var titleScreen = fs.readFileSync('./images/title.jpg', 'base64');
-	io.emit('init', titleScreen);
+	socket.emit('init', titleScreen, players);
 	
-	socket.on('hello', function(msg) {
-		console.log(msg);
+	
+	socket.on('played', function(cell) {
+		io.emit("played", cell);
 	});
+	
+	socket.on('disconnect', function() {
+	    console.log("user disconnect");
+	    players--;
+    });
 });
