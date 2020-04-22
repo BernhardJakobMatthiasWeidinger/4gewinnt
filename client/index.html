@@ -1,0 +1,27 @@
+<html>
+    <head>
+	    <meta charset="utf-8" />
+	    <script src="/socket.io/socket.io.js"></script>
+		<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+		<title>4 Gewinnt</title>
+		<style>
+		</style>
+		
+        <script>
+
+		$( document ).ready(function() {
+            var socket = io();
+
+			$("#login").hide();
+			
+			socket.emit('hello', 'Hello Server');
+		});
+        </script>
+	</head>
+	<body >
+		<div id="login">
+	        HELLO
+		</div>
+	</body>
+</html>
