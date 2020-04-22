@@ -10,18 +10,17 @@
 		
         <script>
 
-		$( document ).ready(function() {
+		$(document).ready(function() {
             var socket = io();
-
-			$("#login").hide();
 			
-			socket.emit('hello', 'Hello Server');
+			socket.on('init', function(stwing) {
+			    $("#title").attr("src", 'data:image/png;base64,' + stwing);
+			});
+			socket.emit('hello', 'Got image');
 		});
         </script>
 	</head>
 	<body >
-		<div id="login">
-	        HELLO
-		</div>
+	   <img id="title" />
 	</body>
 </html>
