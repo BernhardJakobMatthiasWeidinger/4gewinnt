@@ -12,15 +12,63 @@
 
 		$(document).ready(function() {
             var socket = io();
+			var playerName = "";
+			var enemyName = "";
 			
+			$("#game").hide();
+			
+			for (var row=0; row < 6; row++) {
+			    $("#gameField").prepend("<tr> " + 
+				    "<td id='" + row + "1'> </td> " +
+				    "<td id='" + row + "2'> </td> " +
+				    "<td id='" + row + "3'> </td> " +
+				    "<td id='" + row + "4'> </td> " +
+				    "<td id='" + row + "5'> </td> " +
+				    "<td id='" + row + "6'> </td> " +
+				    "<td id='" + row + "7'> </td> " +
+		        "</tr>");
+			}
+			
+			//Will be called on start
 			socket.on('init', function(stwing) {
 			    $("#title").attr("src", 'data:image/png;base64,' + stwing);
 			});
-			socket.emit('hello', 'Got image');
+			
+			//Click to join game
+			$(document).on('click', '#joinGame', function() {
+			    if ($("#username").val()) {
+				    username = $("#username").val();
+			        socket.emit('hello',$("#username").val());
+			        $("#start").hide();
+			        $("#game").show();
+                }
+			});
+			
+			
 		});
         </script>
 	</head>
 	<body >
-	   <img id="title" />
+	    <div id="start">
+		    <img id="title"/>
+			<h3> What's your username? </h3>
+			<input id="username" type="text" maxlength="15"/>
+			<br>
+			<button id="joinGame" type="button" class="btn btn-primary">Join Game</button>
+		</div>
+		
+		<div id="game">
+		    <table id="gameField" class="table table-bordered">
+				<tr id="inputField">
+				    <td> <button id="btn1" type="button" class="btn btn-primary">1</button> </td>
+				    <td> <button id="btn2" type="button" class="btn btn-primary">2</button> </td>
+				    <td> <button id="btn3" type="button" class="btn btn-primary">3</button> </td>
+				    <td> <button id="btn4" type="button" class="btn btn-primary">4</button> </td>
+				    <td> <button id="btn5" type="button" class="btn btn-primary">5</button> </td>
+				    <td> <button id="btn6" type="button" class="btn btn-primary">6</button> </td>
+				    <td> <button id="btn7" type="button" class="btn btn-primary">7</button> </td>
+		        </tr>
+			</table>
+		</div>
 	</body>
 </html>
